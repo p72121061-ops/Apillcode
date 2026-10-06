@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Media Hub – Mobile</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c28;
+    --border: #2a2a3a;
+    --accent: #6c63ff;
+    --accent2: #a78bfa;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --success: #22c55e;
+    --danger: #ef4444;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: -0.3px;
+  }
+
+  header span {
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .container { padding: 20px 16px; }
+
+  /* Upload Card */
+  .upload-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .upload-card h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+  }
+
+  /* Type selector */
+  .type-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .type-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 4px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--muted);
+    font-size: 10px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .type-btn .icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+  .type-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* Input fields */
+  .field { margin-bottom: 12px; }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .field input, .field textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .field input:focus, .field textarea:focus {
+    border-color: var(--accent);
+  }
+
+  .field textarea { resize: none; height: 70px; }
+
+  /* File upload area */
+  .file-drop {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  .file-drop:hover, .file-drop.dragover {
+    border-color: var(--accent);
+    background: rgba(108,99,255,0.05);
+  }
+
+  .file-drop input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .file-drop .drop-icon { font-size: 32px; display: block; margin-bottom: 8px; }
+  .file-drop p { font-size: 13px; color: var(--muted); }
+  .file-drop .file-name { font-size: 12px; color: var(--accent2); margin-top: 6px; font-weight: 500; }
+
+  /* Progress bar */
+  .progress-wrap {
+    display: none;
+    background: var(--surface2);
+    border-radius: 8px;
+    height: 6px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    transition: width 0.3s;
+    width: 0%;
+  }
+
+  /* Buttons */
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-primary:hover { background: #5b54e8; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: transform 0.3s ease;
+    z-index: 999;
+    white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--success); color: var(--success); }
+  .toast.error { border-color: var(--danger); color: var(--danger); }
+
+  /* Files list */
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title span {
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .file-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .file-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .file-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .file-icon.pdf { background: rgba(239,68,68,0.15); }
+  .file-icon.image { background: rgba(34,197,94,0.15); }
+  .file-icon.video { background: rgba(59,130,246,0.15); }
+  .file-icon.audio { background: rgba(168,85,247,0.15); }
+  .file-icon.link { background: rgba(251,191,36,0.15); }
+
+  .file-info { flex: 1; min-width: 0; }
+
+  .file-info .name {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .file-info .meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .delete-btn {
+    background: rgba(239,68,68,0.1);
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .delete-btn:hover { background: rgba(239,68,68,0.25); }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .empty-state .empty-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+
+  /* Link mode */
+  #linkSection { display: none; }
+  #fileSection { display: block; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📱 Media Hub</h1>
+  <span>Mobile Panel</span>
+</header>
+
+<div class="container">
+
+  <!-- Upload Card -->
+  <div class="upload-card">
+    <h2>Add New</h2>
+
+    <!-- Type Selector -->
+    <div class="type-grid">
+      <button class="type-btn active" onclick="setType('pdf', this)">
+        <span class="icon">📄</span>PDF
+      </button>
+      <button class="type-btn" onclick="setType('image', this)">
+        <span class="icon">🖼️</span>Image
+      </button>
+      <button class="type-btn" onclick="setType('video', this)">
+        <span class="icon">🎬</span>Video
+      </button>
+      <button class="type-btn" onclick="setType('audio', this)">
+        <span class="icon">🎵</span>Audio
+      </button>
+      <button class="type-btn" onclick="setType('link', this)">
+        <span class="icon">🔗</span>Link
+      </button>
+    </div>
+
+    <!-- Title field -->
+    <div class="field">
+      <label>Title</label>
+      <input type="text" id="titleInput" placeholder="Enter a name...">
+    </div>
+
+    <!-- File section -->
+    <div id="fileSection">
+      <div class="file-drop" id="dropZone">
+        <input type="file" id="fileInput" onchange="handleFileSelect(this)">
+        <span class="drop-icon">☁️</span>
+        <p>Tap to select file</p>
+        <p class="file-name" id="selectedFileName"></p>
+      </div>
+    </div>
+
+    <!-- Link section -->
+    <div id="linkSection">
+      <div class="field">
+        <label>URL</label>
+        <input type="url" id="linkInput" placeholder="https://...">
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <button class="btn btn-primary" id="uploadBtn" onclick="handleUpload()">
+      Add to TV 📺
+    </button>
+  </div>
+
+  <!-- Files List -->
+  <div class="section-title">
+    On TV <span id="fileCount">0</span>
+  </div>
+  <div class="file-list" id="fileList">
+    <div class="empty-state">
+      <span class="empty-icon">📭</span>
+      Kuch nahi hai abhi — upar se add karo!
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  const SUPABASE_URL = 'https://apibpgwficxocziaoebq.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwaWJwZ3dmaWN4b2N6aWFvZWJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyNjcwODMsImV4cCI6MjEwNjg0MzA4M30.Qu0_zVq3yh1xmM9_tXhzBtMGAWFJ6Mi_BySwdkcMzeI';
+
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+  window._sb = sb;
+
+  let currentType = 'pdf';
+  let selectedFile = null;
+
+  window.setType = (type, btn) => {
+    currentType = type;
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    if (type === 'link') {
+      document.getElementById('fileSection').style.display = 'none';
+      document.getElementById('linkSection').style.display = 'block';
+    } else {
+      document.getElementById('fileSection').style.display = 'block';
+      document.getElementById('linkSection').style.display = 'none';
+
+      // Set accepted file types
+      const fi = document.getElementById('fileInput');
+      if (type === 'pdf') fi.accept = '.pdf';
+      else if (type === 'image') fi.accept = 'image/*';
+      else if (type === 'video') fi.accept = 'video/*';
+      else if (type === 'audio') fi.accept = 'audio/*';
+      else fi.accept = '*/*';
+    }
+  };
+
+  window.handleFileSelect = (input) => {
+    selectedFile = input.files[0];
+    if (selectedFile) {
+      document.getElementById('selectedFileName').textContent = selectedFile.name;
+      if (!document.getElementById('titleInput').value) {
+        document.getElementById('titleInput').value = selectedFile.name.replace(/\.[^/.]+$/, '');
+      }
+    }
+  };
+
+  window.handleUpload = async () => {
+    const title = document.getElementById('titleInput').value.trim();
+    if (!title) { showToast('Title daalo!', 'error'); return; }
+
+    const btn = document.getElementById('uploadBtn');
+    btn.disabled = true;
+    btn.textContent = 'Adding...';
+
+    try {
+      let fileUrl = null;
+
+      if (currentType === 'link') {
+        fileUrl = document.getElementById('linkInput').value.trim();
+        if (!fileUrl) { showToast('Link daalo!', 'error'); btn.disabled = false; btn.textContent = 'Add to TV 📺'; return; }
+      } else {
+        if (!selectedFile) { showToast('File select karo!', 'error'); btn.disabled = false; btn.textContent = 'Add to TV 📺'; return; }
+
+        // Show progress
+        document.getElementById('progressWrap').style.display = 'block';
+        document.getElementById('progressBar').style.width = '30%';
+
+        const ext = selectedFile.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+
+        document.getElementById('progressBar').style.width = '60%';
+
+        const { data, error } = await sb.storage
+          .from('media')
+          .upload(fileName, selectedFile, { upsert: false });
+
+        if (error) throw error;
+
+        document.getElementById('progressBar').style.width = '85%';
+
+        const { data: urlData } = sb.storage.from('media').getPublicUrl(fileName);
+        fileUrl = urlData.publicUrl;
+      }
+
+      document.getElementById('progressBar').style.width = '95%';
+
+      // Save to DB
+      const { error: dbErr } = await sb.from('media_items').insert({
+        title,
+        type: currentType,
+        url: fileUrl,
+        created_at: new Date().toISOString()
+      });
+
+      if (dbErr) throw dbErr;
+
+      document.getElementById('progressBar').style.width = '100%';
+
+      showToast('TV pe add ho gaya! 🎉', 'success');
+      resetForm();
+      loadFiles();
+
+    } catch (err) {
+      console.error(err);
+      showToast('Error: ' + err.message, 'error');
+    } finally {
+      setTimeout(() => {
+        document.getElementById('progressWrap').style.display = 'none';
+        document.getElementById('progressBar').style.width = '0%';
+      }, 800);
+      btn.disabled = false;
+      btn.textContent = 'Add to TV 📺';
+    }
+  };
+
+  function resetForm() {
+    document.getElementById('titleInput').value = '';
+    document.getElementById('linkInput').value = '';
+    document.getElementById('fileInput').value = '';
+    document.getElementById('selectedFileName').textContent = '';
+    selectedFile = null;
+  }
+
+  async function loadFiles() {
+    const { data, error } = await sb
+      .from('media_items')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) { console.error(error); return; }
+
+    const list = document.getElementById('fileList');
+    const count = document.getElementById('fileCount');
+    count.textContent = data.length;
+
+    if (!data.length) {
+      list.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span>Kuch nahi hai abhi — upar se add karo!</div>`;
+      return;
+    }
+
+    const icons = { pdf: '📄', image: '🖼️', video: '🎬', audio: '🎵', link: '🔗' };
+
+    list.innerHTML = data.map(item => `
+      <div class="file-item">
+        <div class="file-icon ${item.type}">${icons[item.type] || '📁'}</div>
+        <div class="file-info">
+          <div class="name">${item.title}</div>
+          <div class="meta">${item.type.toUpperCase()} • ${new Date(item.created_at).toLocaleDateString('en-IN')}</div>
+        </div>
+        <button class="delete-btn" onclick="deleteItem('${item.id}', '${item.url}', '${item.type}')">🗑️</button>
+      </div>
+    `).join('');
+  }
+
+  window.deleteItem = async (id, url, type) => {
+    if (!confirm('Delete karna hai?')) return;
+
+    // Delete from storage if not a link
+    if (type !== 'link') {
+      const path = url.split('/media/')[1];
+      if (path) await sb.storage.from('media').remove([path]);
+    }
+
+    await sb.from('media_items').delete().eq('id', id);
+    showToast('Delete ho gaya!', 'success');
+    loadFiles();
+  };
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast show ${type}`;
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+
+  // Real-time subscription
+  sb.channel('media_changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'media_items' }, () => loadFiles())
+    .subscribe();
+
+  loadFiles();
+</script>
+</body>
+</html>
